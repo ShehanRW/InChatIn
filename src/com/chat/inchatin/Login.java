@@ -98,11 +98,7 @@ public class Login extends JFrame {
 	}
 	
 	private void login(String name, String address, int port) {
-		if(name==""||address==""||port==0) {
-			System.out.print("OOps");
-		}else {
-			
-		}
 		dispose();
+		new Client(name, address, port);
 	}
 }
