@@ -43,18 +43,19 @@ public class Client extends JFrame {
 		this.address = address;
 		this.port = port;
 		
-		boolean connect = openConnection(address, port);
+		boolean connect = openConnection(address);
 		if(!connect) {
 			console("Error cannot connect to the host");
 		}
 		
 		makeWindow();
 		
-		console("Connected");
-		console("Message from console");
+		console("Attempting a connection to " + address + ":" + port + " user: " + name);
+		String connection = name + "Connected from " + address + ":" + port;
+		send(connection.getBytes());
 	}
 	
-	public boolean openConnection(String address, int port) {
+	public boolean openConnection(String address) {
 		try {
 			socket = new DatagramSocket();
 			ip = InetAddress.getByName(address);
@@ -63,19 +64,6 @@ public class Client extends JFrame {
 			return false;
 		}
 		return true;
-	}
-	
-	public String recieve() {
-		byte[] data = new byte[1024];
-		DatagramPacket packet = new DatagramPacket(data, data.length);
-		
-		try {
-			socket.receive(packet);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		String message = new String(packet.getData());
-		return message;
 	}
 	
 	private void send(final byte[] data) {
@@ -90,6 +78,19 @@ public class Client extends JFrame {
 			}
 		};
 		send.start();
+	}
+	
+	public String recieve() {
+		byte[] data = new byte[1024];
+		DatagramPacket packet = new DatagramPacket(data, data.length);
+		
+		try {
+			socket.receive(packet);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String message = new String(packet.getData());
+		return message;
 	}
 	
 	private void makeWindow() {
@@ -161,12 +162,14 @@ public class Client extends JFrame {
 	
 	public void console(String message) {
 		textHistory.append(message + "\n\r");
+		textHistory.setCaretPosition(textHistory.getDocument().getLength());
 	}
 	
 	public void send(String message) {
 		if(message.equals(""))return;
-		console(name+": "+message);
-		textHistory.setCaretPosition(textHistory.getDocument().getLength());
+		message = name + ": " + message;
+		console(message);
+		send(message.getBytes());
 		textMessage.setText("");
 	}
 }

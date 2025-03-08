@@ -36,9 +36,6 @@ public class Login extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
 	public Login() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -90,14 +87,14 @@ public class Login extends JFrame {
 				String name = textName.getText();
 				String address = textAddress.getText();
 				int port = Integer.parseInt(textPort.getText());
-				login(name, address, port);
+				loginFunc(name, address, port);
 			}
 		});
 		btnNewButton.setBounds(97, 278, 89, 23);
 		contentPane.add(btnNewButton);
 	}
 	
-	private void login(String name, String address, int port) {
+	private void loginFunc(String name, String address, int port) {
 		dispose();
 		new Client(name, address, port);
 	}
