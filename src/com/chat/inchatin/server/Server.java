@@ -107,6 +107,7 @@ public class Server implements Runnable {
 				}
     		}
     	};
+    	send.start();
     }
 
     public void stop() {
