@@ -3,6 +3,7 @@ package com.chat.inchatin.server;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ public class Server implements Runnable {
 
     private int port;
     private DatagramSocket socket;
-    private Thread run, manage, receive;
+    private Thread run, manage, receive, send;
     private volatile boolean running = false;
     
     private List<ServerClient> clients = new ArrayList<ServerClient>();
@@ -79,9 +80,33 @@ public class Server implements Runnable {
     		clients.add(new ServerClient(data.substring(3, data.length()), packet.getAddress(), packet.getPort(), id));
     		System.out.println(data.substring(3, data.length()));
     	}
-    	else {
-    		System.out.println(data);
+    	else if(data.startsWith("/m/")) {
+    		String message = data.substring(3, data.length());
+    		sendToAll(message);
     	}
+    	else {
+    		System.out.println(data);    		
+    	}
+    }
+    
+    private void sendToAll(String message) {
+    	for(int i = 0; i<clients.size();i++) {
+    		ServerClient client = clients.get(i);
+    		send(message.getBytes(), client.address, client.port );
+    	}
+    }
+    
+    private void send(final byte[] data, final InetAddress address, final int port) {
+    	send = new Thread("Send") {
+    		public void run() {
+    			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+    			try {
+					socket.send(packet);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+    		}
+    	};
     }
 
     public void stop() {
